@@ -114,6 +114,8 @@ Optional:
    - creation timestamp
 4. Providers must fail clearly if cleanup is requested but ownership cannot be proven.
 
+For providers with limited metadata support, a deterministic managed naming convention is acceptable ownership proof for MVP.
+
 ## Best first implementation scope
 
 ### MVP
