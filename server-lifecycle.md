@@ -94,6 +94,11 @@ Providers that support `server_lifecycle` should expose:
 - fetch server details
 - delete server
 
+The shared PHP contract for this capability is
+`ShipperCli\\Contracts\\ServerLifecycleProviderInterface`. Its deletion method
+requires an ownership token so a provider cannot accidentally treat an
+arbitrary server ID as Shipper-managed.
+
 Optional:
 
 - restart server

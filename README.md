@@ -151,6 +151,10 @@ provider:
       state: unsupported
     previews:
       state: partial
+    server_lifecycle:
+      state: supported
+      requirements:
+        - "Provider credentials can create and inspect servers."
 ```
 
 ## Provider implementation rules
