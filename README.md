@@ -145,12 +145,17 @@ provider:
       state: supported
     background_workloads:
       state: partial
+      limitations:
+        - "Queue workers are not managed by the provider."
     observability:
       state: partial
+      notes: "Only deployment logs are available."
     rollback:
       state: unsupported
     previews:
       state: partial
+      limitations:
+        - "Preview cleanup requires an explicit provider operation."
     server_lifecycle:
       state: supported
       requirements:
@@ -159,11 +164,16 @@ provider:
 
 ## Provider implementation rules
 
-1. A provider package must declare capability states explicitly.
-2. Partial support must explain limitations.
-3. Provider-specific config belongs in the provider package and provider docs.
-4. Core docs should describe generic Shipper workflow, not provider quirks.
-5. A missing capability should fail clearly rather than behaving implicitly.
+1. A provider package must declare every canonical key: `app_deploy`,
+   `domain_management`, `ssl`, `env`, `databases`, `profiles`,
+   `background_workloads`, `observability`, `rollback`, `previews`, and
+   `server_lifecycle`.
+2. A provider package must validate its manifest with
+   `ShipperCli\\Contracts\\CapabilityManifest::from()`.
+3. Partial support must include non-empty `notes` or `limitations`.
+4. Provider-specific config belongs in the provider package and provider docs.
+5. Core docs should describe generic Shipper workflow, not provider quirks.
+6. A missing capability should fail clearly rather than behaving implicitly.
 
 ## Documentation split
 
