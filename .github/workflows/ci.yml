@@ -1,4 +1,4 @@
-+name: Content CI
+name: Content CI
 
 on:
   push:
