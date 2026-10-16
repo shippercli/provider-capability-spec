@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Validate Markdown content
+    name: Content CI / Validate Markdown content
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
