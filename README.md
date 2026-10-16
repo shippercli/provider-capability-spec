@@ -201,6 +201,12 @@ limitations; this specification does not assert that existing releases satisfy t
 - Read environment-based markers as effective assignments, including quoting and
   duplicate-key precedence. Marker-looking text inside multiline values does not
   prove ownership; malformed evidence must fail closed.
+- Require a successful, structurally valid response for ownership evidence. Explicit
+  failure/error fields override matching content. Missing content is unreadable,
+  not an empty environment or proof of resource absence.
+- Parse the complete ownership document. A valid marker followed by an unfinished
+  quoted value must not authorize mutation, even when the parser returns the
+  earlier assignments.
 
 ### Database connections
 
@@ -214,6 +220,14 @@ limitations; this specification does not assert that existing releases satisfy t
 - Prove required database/site associations before reuse or cleanup. Preserve
   resources and connection evidence when a prerequisite deletion fails.
 - Exclude generated secrets from plans, logs, errors, and debug output.
+- Verify persisted selected connection values through the supported read path;
+  an acknowledged write alone does not establish delivery. Refuse unreadable,
+  incomplete or mismatching readback before dependent operations.
+- Deliver each confirmed connection before creating the next database. A fresh
+  retry must retain earlier credentials and create only missing resources.
+- Run configuration steps sequentially and stop at a failed prerequisite. Document
+  ambiguous creation/storage, delayed persistence, partial cleanup and recovery
+  procedures. Incremental writes alone provide neither atomicity nor durability.
 
 ### Evidence required for review
 
@@ -226,6 +240,26 @@ are used, exercise their actual format through public listing and cleanup paths.
 Mocked API tests, dependency audits, builds, and live provider checks are separate
 evidence. Record which were performed and the tested versions; a green manifest
 validator or mocked suite alone does not prove a live deployment works.
+
+### Minimum failure-path scenarios
+
+Record the operation trace and resulting resource/connection state for each
+applicable scenario. A refusal test must fail when its source guard is disabled,
+not merely assert that an exception occurred somewhere in the flow.
+
+| Scenario | Required observable result |
+| --- | --- |
+| Matching ownership marker plus unfinished trailing value | No update or deletion request; valid multiline control remains accepted. |
+| Matching marker in an explicitly failed API response | No ownership-inferred mutation or deletion. |
+| Missing environment content versus explicitly empty content | Missing is refused; explicit empty is readable but does not prove ownership. |
+| Write acknowledged but selected values absent on fresh read | Failure before dependent configuration or deployment; no secret in diagnostics. |
+| First database confirmed, second creation fails | First connection remains available; report the partial outcome. |
+| Fresh process retries the partial operation | Reuse confirmed first resource without password rotation; create only missing resources. |
+| Configuration prerequisite fails | Later configuration mutations and deployment are not invoked. |
+
+A simulated API can verify serialization and request order; it cannot establish
+live database authentication, provider persistence timing, or concurrency safety.
+Acceptance evidence must name those limits and leave unverified requirements open.
 
 ## Documentation split
 
