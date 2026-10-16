@@ -198,6 +198,16 @@ limitations; this specification does not assert that existing releases satisfy t
 - Apply the same scope checks to reconciliation, destroy, and orphan cleanup.
   Missing owned resources may be treated as already removed. Legacy ownership
   formats require an explicit, separately reviewed migration.
+- Adoption is per-resource and requires operator authorization for the exact
+  identity and scope. The plan must list adopted resources and planned changes;
+  `--force` alone is insufficient. Apply rechecks identity/scope and persists
+  `adopted` state without converting it to Shipper-created ownership. Destroy
+  preserves adopted resources. A child resource under an adopted parent may be
+  deleted only when Shipper separately recorded creating that exact child in
+  scope. Deleting an adopted resource requires a separate, recorded ownership
+  transfer or deletion authorization; parent adoption does not authorize
+  recursive deletion. Providers unable to persist and verify this state refuse
+  adoption.
 - Read environment-based markers as effective assignments, including quoting and
   duplicate-key precedence. Marker-looking text inside multiline values does not
   prove ownership; malformed evidence must fail closed.
