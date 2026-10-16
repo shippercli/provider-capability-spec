@@ -175,6 +175,58 @@ provider:
 5. Core docs should describe generic Shipper workflow, not provider quirks.
 6. A missing capability should fail clearly rather than behaving implicitly.
 
+## Ownership and credential acceptance criteria
+
+Capability declarations describe supported behavior; they do not establish that a
+particular deployment is safe to mutate. These criteria apply across application,
+database, workload, preview, and server lifecycle operations. See the proposed
+[contracts ownership and credential requirements](https://github.com/shippercli/contracts/pull/5).
+Provider releases must document which criteria they satisfy and any remaining
+limitations; this specification does not assert that existing releases satisfy them.
+
+### Resource ownership
+
+- Verify persisted Shipper ownership evidence for the exact project/profile before
+  updating or deleting an existing resource. A matching name, domain, explicit UUID,
+  or generic Shipper marker alone is insufficient.
+- Encode scope boundaries unambiguously. Distinct project/profile pairs must not
+  share ownership evidence because of delimiters, case folding, slug normalization,
+  truncation, or a wildcard sentinel.
+- Refuse unmanaged or differently scoped collisions before writes. Do not silently
+  retag resources or create a duplicate to bypass an ownership failure. Plan output
+  must identify blocked collisions.
+- Apply the same scope checks to reconciliation, destroy, and orphan cleanup.
+  Missing owned resources may be treated as already removed. Legacy ownership
+  formats require an explicit, separately reviewed migration.
+- Read environment-based markers as effective assignments, including quoting and
+  duplicate-key precedence. Marker-looking text inside multiline values does not
+  prove ownership; malformed evidence must fail closed.
+
+### Database connections
+
+- Deliver host, database, username, and password through the intended application's
+  environment or a supported secret reference before deployment.
+- Map multiple databases to distinct connection variables or secret references.
+  Reject ambiguous mappings and normalized resource-name collisions before writes.
+- Generate an independent password for each new database unless shared credentials
+  are explicitly configured. Preserve existing passwords and working connection
+  settings on re-apply; unavailable credentials require an actionable failure.
+- Prove required database/site associations before reuse or cleanup. Preserve
+  resources and connection evidence when a prerequisite deletion fails.
+- Exclude generated secrets from plans, logs, errors, and debug output.
+
+### Evidence required for review
+
+Provider changes should include regressions for unowned and cross-scope resources,
+legacy markers, naming collisions, malformed evidence, re-apply credential
+preservation, multiple databases, and exact preview cleanup scope. Tests must
+assert the writes that occur and the writes that are refused. When generated tags
+are used, exercise their actual format through public listing and cleanup paths.
+
+Mocked API tests, dependency audits, builds, and live provider checks are separate
+evidence. Record which were performed and the tested versions; a green manifest
+validator or mocked suite alone does not prove a live deployment works.
+
 ## Documentation split
 
 ### Core docs should cover
