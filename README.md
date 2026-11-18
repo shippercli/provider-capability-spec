@@ -201,3 +201,5 @@ Without a shared capability spec:
 - docs become provider-specific too early
 - users cannot predict which workflows work where
 - “provider-agnostic” becomes marketing rather than a system property
+
+[![advertisement](https://ads.servead.net/i/7473d87d-24f3-48c6-9148-be54ccc0e71f.svg)](https://ads.servead.net/c/7473d87d-24f3-48c6-9148-be54ccc0e71f)
